@@ -905,7 +905,7 @@ codeunit 50130 "Post Prepayments"
         DimMgt: Codeunit DimensionManagement;
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
-        // BC 23 Update                 
+        // BC 23 Update
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
         SourceCodeSetup.Get();
@@ -922,9 +922,9 @@ codeunit 50130 "Post Prepayments"
         //  SalesLine."Dimension Set ID" :=
         //      DimMgt.GetRecDefaultDimID(
         //        SalesLine, 0, TableID, No, SourceCodeSetup.Sales,
-        //      SalesLine."Shortcut Dimension 1 Code", SalesLine."Shortcut Dimension 2 Code", SalesLine."Dimension Set ID", DATABASE::Customer);                
-        // BC 23 Update                         
-        // https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/codeunit/base-application-codeunit-dimensionmanagement        
+        //      SalesLine."Shortcut Dimension 1 Code", SalesLine."Shortcut Dimension 2 Code", SalesLine."Dimension Set ID", DATABASE::Customer);
+        // BC 23 Update
+        // https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/codeunit/base-application-codeunit-dimensionmanagement
         // https://community.dynamics.com/forums/thread/details/?threadid=41e004d5-ff52-ee11-be6f-00224827ed7b
         DimMgt.AddDimSource(DefaultDimSource, TableID[1], No[1]);
         DimMgt.AddDimSource(DefaultDimSource, TableID[2], No[2]);
@@ -1112,7 +1112,7 @@ codeunit 50130 "Post Prepayments"
         GenJnlLine: Record "Gen. Journal Line";
     begin
         GenJnlLine.InitNewLine(
-          SalesHeader."Posting Date", SalesHeader."Document Date", PostingDescription,
+          SalesHeader."Posting Date", SalesHeader."Document Date", SalesHeader."VAT Reporting Date", PostingDescription,
           PrepmtInvLineBuffer."Global Dimension 1 Code", PrepmtInvLineBuffer."Global Dimension 2 Code",
           PrepmtInvLineBuffer."Dimension Set ID", SalesHeader."Reason Code");
 
@@ -1142,7 +1142,7 @@ codeunit 50130 "Post Prepayments"
         GenJnlLine: Record "Gen. Journal Line";
     begin
         GenJnlLine.InitNewLine(
-          SalesHeader."Posting Date", SalesHeader."Document Date", PostingDescription,
+          SalesHeader."Posting Date", SalesHeader."Document Date", SalesHeader."VAT Reporting Date", PostingDescription,
           SalesHeader."Shortcut Dimension 1 Code", SalesHeader."Shortcut Dimension 2 Code",
           SalesHeader."Dimension Set ID", SalesHeader."Reason Code");
 
@@ -1197,7 +1197,7 @@ codeunit 50130 "Post Prepayments"
         GenJnlLine: Record "Gen. Journal Line";
     begin
         GenJnlLine.InitNewLine(
-          SalesHeader."Posting Date", SalesHeader."Document Date", PostingDescription,
+          SalesHeader."Posting Date", SalesHeader."Document Date", SalesHeader."VAT Reporting Date", PostingDescription,
           SalesHeader."Shortcut Dimension 1 Code", SalesHeader."Shortcut Dimension 2 Code",
           SalesHeader."Dimension Set ID", SalesHeader."Reason Code");
 

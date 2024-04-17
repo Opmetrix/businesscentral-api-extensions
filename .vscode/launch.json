@@ -22,6 +22,26 @@
             "primaryTenantDomain": "opmetrix.onmicrosoft.com"
         },
         {
+            "name": "Publish: Opmetrix cloud NZ Preview sandbox",
+            "type": "al",
+            "request": "launch",
+            "environmentType": "Sandbox",
+            "environmentName": "Sandbox_Preview",
+            "server": "https://businesscentral.dynamics.com/43e728f5-a0d9-484d-9971-db0137ca2c70/Sandbox_Preview",
+            "serverInstance": "BC",
+            /*"authentication": "UserPassword",*/
+            "startupObjectId": 22,
+            "breakOnError": true,
+            "breakOnRecordWrite": false,
+            "launchBrowser": true,
+            "enableSqlInformationDebugger": true,
+            "enableLongRunningSqlStatements": true,
+            "longRunningSqlStatementsThreshold": 500,
+            "numberOfSqlStatements": 10,
+            "tenant": "43e728f5-a0d9-484d-9971-db0137ca2c70",
+            "primaryTenantDomain": "opmetrix.onmicrosoft.com"
+        },
+        {
             "name": "Attach: Opmetrix cloud NZ sandbox",
             "type": "al",
             "request": "attach",
