@@ -684,7 +684,8 @@ codeunit 50130 "Post Prepayments"
                           /*
                            * Added to fix "There is no argument given that corresponds to the required formal parameter 'IsFullGST'"
                            */
-                          false
+                          false,
+                          0
                         );
 #endif
                     end;
