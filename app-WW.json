@@ -2,7 +2,7 @@
   "id": "f590f914-df9f-4a49-90ad-047ac6f3ef7e",
   "name": "Opmetrix Business Central API Extensions - WW",
   "publisher": "Opmetrix",
-  "version": "4.0.0.2",
+  "version": "5.0.0.0",
   "brief": "Extends the OData API for Opmetrix integration",
   "description": "Extends the OData API with additional endpoints to be able to access stock locations, tax, special pricing",
   "privacyStatement": "",
