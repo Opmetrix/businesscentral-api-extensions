@@ -313,20 +313,20 @@ codeunit 50130 "Post Prepayments"
         end;
     end;
 
-    local procedure PrepmtDocTypeToDocType(DocumentType: Option Invoice,"Credit Memo"): Integer
+    local procedure PrepmtDocTypeToDocType(DocumentType: Option Invoice,"Credit Memo"): Enum "Sales Document Type"
     begin
         case DocumentType of
             DocumentType::Invoice:
-                exit(2);
+                exit("Sales Document Type"::Invoice);
             DocumentType::"Credit Memo":
-                exit(3);
+                exit("Sales Document Type"::"Credit Memo");
         end;
-        exit(2);
+        exit("Sales Document Type"::Invoice);
     end;
 
     local procedure UpdateDocNos(var SalesHeader: Record "Sales Header"; DocumentType: Option Invoice,"Credit Memo"; var DocNo: Code[20]; var NoSeriesCode: Code[20]; var ModifyHeader: Boolean)
     var
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series";
     begin
         ModifyHeader := false;
         case DocumentType of
@@ -507,9 +507,9 @@ codeunit 50130 "Post Prepayments"
 
         case ToDocType of
             DATABASE::"Sales Invoice Header":
-                SalesCommentLine.CopyHeaderComments(SalesCommentLine."Document Type"::Order, SalesCommentLine."Document Type"::"Posted Invoice", FromNumber, ToNumber);
+                SalesCommentLine.CopyHeaderComments(SalesCommentLine."Document Type"::Order.AsInteger(), SalesCommentLine."Document Type"::"Posted Invoice".AsInteger(), FromNumber, ToNumber);
             DATABASE::"Sales Cr.Memo Header":
-                SalesCommentLine.CopyHeaderComments(SalesCommentLine."Document Type"::Order, SalesCommentLine."Document Type"::"Posted Credit Memo", FromNumber, ToNumber);
+                SalesCommentLine.CopyHeaderComments(SalesCommentLine."Document Type"::Order.AsInteger(), SalesCommentLine."Document Type"::"Posted Credit Memo".AsInteger(), FromNumber, ToNumber);
         end;
     end;
 
@@ -522,9 +522,9 @@ codeunit 50130 "Post Prepayments"
 
         case ToDocType of
             DATABASE::"Sales Invoice Header":
-                SalesCommentLine.CopyLineComments(SalesCommentLine."Document Type"::Order, SalesCommentLine."Document Type"::"Posted Invoice", FromNumber, ToNumber, FromLineNo, ToLineNo);
+                SalesCommentLine.CopyLineComments(SalesCommentLine."Document Type"::Order.AsInteger(), SalesCommentLine."Document Type"::"Posted Invoice".AsInteger(), FromNumber, ToNumber, FromLineNo, ToLineNo);
             DATABASE::"Sales Cr.Memo Header":
-                SalesCommentLine.CopyLineComments(SalesCommentLine."Document Type"::Order, SalesCommentLine."Document Type"::"Posted Credit Memo", FromNumber, ToNumber, FromLineNo, ToLineNo);
+                SalesCommentLine.CopyLineComments(SalesCommentLine."Document Type"::Order.AsInteger(), SalesCommentLine."Document Type"::"Posted Credit Memo".AsInteger(), FromNumber, ToNumber, FromLineNo, ToLineNo);
         end;
     end;
 
@@ -560,7 +560,7 @@ codeunit 50130 "Post Prepayments"
         ApplyFilter(SalesHeader, DocumentType, SalesLine);
         SalesLine.CalcSums("Prepmt. Line Amount", "Prepmt. Amt. Inv.");
         PrepmtAmtToInvTotal := SalesLine."Prepmt. Line Amount" - SalesLine."Prepmt. Amt. Inv.";
-        if SalesLine.FindSet(true, false) then
+        if SalesLine.FindSet() then
             repeat
                 PrepmtAmt := PrepmtAmount(SalesLine, DocumentType);
                 if PrepmtAmt <> 0 then begin
@@ -672,22 +672,14 @@ codeunit 50130 "Post Prepayments"
                     if not VATAmountLine.Get(
                          SalesLine."Prepayment VAT Identifier", SalesLine."Prepmt. VAT Calc. Type", SalesLine."Prepayment Tax Group Code", false, NewAmount >= 0)
                     then begin
-#if BUILD_REGION_AUNZ
-                        VATAmountLine.InsertNewLine(
-                          SalesLine."Prepayment VAT Identifier",
-                          SalesLine."Prepmt. VAT Calc. Type",
-                          SalesLine."Prepayment Tax Group Code",
-                          false,
-                          SalesLine."Prepayment VAT %",
-                          NewAmount >= 0,
-                          true,
-                          /*
-                           * Added to fix "There is no argument given that corresponds to the required formal parameter 'IsFullGST'"
-                           */
-                          false,
-                          SalesLine."Prepmt VAT Diff. to Deduct"
-                        );
-#endif
+                        VATAmountLine.Init();
+                        VATAmountLine."VAT Identifier" := SalesLine."Prepayment VAT Identifier";
+                        VATAmountLine."VAT Calculation Type" := SalesLine."Prepmt. VAT Calc. Type";
+                        VATAmountLine."Tax Group Code" := SalesLine."Prepayment Tax Group Code";
+                        VATAmountLine."Use Tax" := false;
+                        VATAmountLine."VAT %" := SalesLine."Prepayment VAT %";
+                        VATAmountLine.Positive := NewAmount >= 0;
+                        VATAmountLine.Insert();
                     end;
 
                     VATAmountLine."Line Amount" := VATAmountLine."Line Amount" + NewAmount;
