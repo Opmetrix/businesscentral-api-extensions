@@ -326,7 +326,7 @@ codeunit 50130 "Post Prepayments"
 
     local procedure UpdateDocNos(var SalesHeader: Record "Sales Header"; DocumentType: Option Invoice,"Credit Memo"; var DocNo: Code[20]; var NoSeriesCode: Code[20]; var ModifyHeader: Boolean)
     var
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series";
     begin
         ModifyHeader := false;
         case DocumentType of
