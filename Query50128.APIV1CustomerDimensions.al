@@ -6,7 +6,7 @@ query 50128 "Customer Dimensions Extension"
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
     EntityName = 'customerDimension';
-    EntitySetName = 'customerDimensions';
+    EntitySetName = 'customerDimensions' ;
 
     elements
     {
