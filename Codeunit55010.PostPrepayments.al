@@ -1,5 +1,5 @@
 //https://github.com/YevgenKarpinka/Sprut_API_v16/blob/23b1af30e62f02283066330c23431de9757ed542/Codeunit/Codeunit50002.SalesPostPrepaymentsSprut.al
-codeunit 50130 "Post Prepayments"
+codeunit 55010 "Post Prepayments"
 {
     Permissions = TableData "Sales Line" = imd,
                   TableData "Invoice Posting Buffer" = imd,
@@ -326,7 +326,7 @@ codeunit 50130 "Post Prepayments"
 
     local procedure UpdateDocNos(var SalesHeader: Record "Sales Header"; DocumentType: Option Invoice,"Credit Memo"; var DocNo: Code[20]; var NoSeriesCode: Code[20]; var ModifyHeader: Boolean)
     var
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit "No. Series";
     begin
         ModifyHeader := false;
         case DocumentType of

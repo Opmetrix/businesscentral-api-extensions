@@ -1,70 +1,63 @@
-
 #pragma implicitwith disable
-page 50122 SpecialDiscounts
+page 55007 "Customer Addresses"
 {
     PageType = API;
-    Caption = 'Special Discounts API';
+    Caption = 'Customer Addresses Extension';
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
-    EntityName = 'salesDiscount';
-    EntitySetName = 'salesDiscounts';
-    //SourceTable = 7004;
+    EntityName = 'customerAddress';
+    EntitySetName = 'customerAddresses';
     DelayedInsert = true;
 
-    SourceTable = "Sales Line Discount";
+    SourceTable = "Ship-to Address";
+    //SourceTable = 222;
 
     layout
     {
         area(Content)
         {
-            field(code; Rec.Code)
-            {
-                ApplicationArea = All;
-            }
-            field(salesType; Rec."Sales Type")
-            {
-                Caption = 'Sales Type';
-                ApplicationArea = All;
-            }
-            field(salesCode; Rec."Sales Code")
-            {
-                Caption = 'Sales Code';
-                ApplicationArea = All;
-            }
-            field(startingDate; Rec."Starting Date")
-            {
-                ApplicationArea = All;
-            }
-            field(endingDate; Rec."Ending Date")
-            {
-                ApplicationArea = All;
-            }
-            field(currencyCode; Rec."Currency Code")
-            {
-                ApplicationArea = All;
-            }
-            field(unitofMeasureCode; Rec."Unit of Measure Code")
-            {
-                ApplicationArea = All;
-            }
-            field(minimumQuantity; Rec."Minimum Quantity")
-            {
-                ApplicationArea = All;
-            }
-            field(lineDiscountPercentage; Rec."Line Discount %")
-            {
-                ApplicationArea = All;
-            }
-            field(type; Rec.Type)
-            {
-                ApplicationArea = All;
-            }
-            field(variantCode; Rec."Variant Code")
-            {
-                ApplicationArea = All;
-            }
 
+            field("customerNumber"; Rec."Customer No.")
+            {
+                ApplicationArea = All;
+            }
+            field("code"; Rec.Code)
+            {
+                ApplicationArea = All;
+            }
+            field("name"; Rec.Name)
+            {
+                ApplicationArea = All;
+            }
+            field("address"; Rec.Address)
+            {
+                ApplicationArea = All;
+            }
+            field("name2"; Rec."Name 2")
+            {
+                ApplicationArea = All;
+            }
+            field("address2"; Rec."Address 2")
+            {
+                ApplicationArea = All;
+            }
+            field("city"; Rec.City)
+            {
+                ApplicationArea = All;
+            }
+            field("postcode"; Rec."Post Code")
+            {
+                ApplicationArea = All;
+            }
+            field("county"; Rec."County")
+            {
+                ApplicationArea = All;
+            }
+            field("regionCode"; Rec."Country/Region Code")
+            {
+                ApplicationArea = All;
+            }
             field(id; Rec.SystemId)
             {
                 ApplicationArea = All;

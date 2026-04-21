@@ -1,54 +1,51 @@
-page 50133 "Item Unit Of Measure"
+page 55001 "Customer Entity Extension"
 {
     PageType = API;
-    Caption = 'Item Unit Of Measure';
+    Caption = 'Customer Entity Extension';
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
-    EntityName = 'itemUnitOfMeasure';
-    EntitySetName = 'itemUnitOfMeasures';
+    EntityName = 'customer';
+    EntitySetName = 'customers';
     DelayedInsert = true;
 
-    SourceTable = "Item Unit of Measure";
-    //SourceTable = 5404;
+    SourceTable = "Customer";
+    //SourceTable = 18;
+    ODataKeyFields = SystemId;
 
     layout
     {
         area(Content)
         {
-            field("itemNumber"; Rec."Item No.")
+            field("ID"; Rec.SystemId)
             {
                 ApplicationArea = All;
             }
-            field("unitOfMeasureCode"; Rec."Code")
+            field("customerNumber"; Rec."No.")
             {
                 ApplicationArea = All;
             }
-            field("quantityPerUnitOfMeasure"; Rec."Qty. per Unit of Measure")
+            field("customerDiscountGroup"; Rec."Customer Disc. Group")
             {
                 ApplicationArea = All;
             }
-            field("length"; Rec.Length)
+            field("customerPriceGroup"; Rec."Customer Price Group")
             {
                 ApplicationArea = All;
             }
-            field("width"; Rec.Width)
+            field("creditLimit"; Rec."Credit Limit (LCY)")
             {
                 ApplicationArea = All;
             }
-            field("height"; Rec.Height)
+            field("salespersonCode"; Rec."Salesperson Code")
             {
                 ApplicationArea = All;
             }
-            field("cubage"; Rec.Cubage)
+            field("allowLineDiscount"; Rec."Allow Line Disc.")
             {
                 ApplicationArea = All;
             }
-            field("weight"; Rec.Weight)
-            {
-                ApplicationArea = All;
-            }
-            field(id; Rec.SystemId)
+            field("invoiceDiscountCode"; Rec."Invoice Disc. Code")
             {
                 ApplicationArea = All;
             }

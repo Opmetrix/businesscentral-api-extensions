@@ -1,43 +1,37 @@
-page 50126 TaxRates
+page 55003 "Customer Discount Extension"
 {
     PageType = API;
-    Caption = 'Tax Rates API';
+    Caption = 'Customer Discount Extension';
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
-    EntityName = 'taxRate';
-    EntitySetName = 'taxRates';
+    EntityName = 'customerDiscount';
+    EntitySetName = 'customerDiscounts';
     DelayedInsert = true;
 
-    //SourceTable = 325
-    SourceTable = "VAT Posting Setup";
+    SourceTable = "Cust. Invoice Disc.";
+    //SourceTable = 19;
 
     layout
     {
         area(Content)
         {
-            field(businessPostingGroup; Rec."VAT Bus. Posting Group")
+            field("invoiceDiscountCode"; Rec.Code)
             {
                 ApplicationArea = All;
             }
-            field(productPostingGroup; Rec."VAT Prod. Posting Group")
+            field("minimumAmount"; Rec."Minimum Amount")
             {
                 ApplicationArea = All;
             }
-            field(calculationType; Rec."VAT Calculation Type")
+            field("discountPercent"; Rec."Discount %")
             {
                 ApplicationArea = All;
             }
-            field(percentage; Rec."VAT %")
+            field(id; Rec.SystemId)
             {
                 ApplicationArea = All;
             }
-            field(ID; Rec."VAT Identifier")
-            {
-                ApplicationArea = All;
-            }
-
-
             field(lastModifiedDateTime; Rec.SystemModifiedAt)
             {
                 ApplicationArea = All;

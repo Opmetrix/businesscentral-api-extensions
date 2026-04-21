@@ -1,4 +1,4 @@
-query 50138 "ItemAttributes"
+query 55018 "ItemAttributes"
 {
 
     QueryType = API;

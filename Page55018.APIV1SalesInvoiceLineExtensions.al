@@ -1,4 +1,4 @@
-page 50138 "Sales Invoice Line Extension"
+page 55018 "Sales Invoice Line Extension"
 {
     PageType = ListPart;
     Caption = 'Sales Invoice Line Extension';

@@ -1,5 +1,5 @@
 #pragma implicitwith disable
-page 50128 "APIV1 - Cust. Paym. Journals"
+page 55008 "APIV1 - Cust. Paym. Journals"
 {
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';

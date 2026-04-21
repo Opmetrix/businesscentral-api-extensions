@@ -1,4 +1,4 @@
-query 50136 ItemCrossReferences
+query 55016 ItemCrossReferences
 {
     QueryType = API;
     Caption = 'Item Cross Referencess Entity';

@@ -1,5 +1,5 @@
 #pragma implicitwith disable
-page 50136 "Price List Lines Entity"
+page 55016 "Price List Lines Entity"
 {
     PageType = API;
     Caption = 'Price List Lines';

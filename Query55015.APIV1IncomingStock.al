@@ -1,4 +1,4 @@
-query 50135 IncomingItems
+query 55015 IncomingItems
 {
     QueryType = API;
     Caption = 'Incoming Items Entity';

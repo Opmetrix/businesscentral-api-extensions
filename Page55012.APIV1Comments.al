@@ -1,30 +1,42 @@
-page 50123 "Customer Discount Extension"
+page 55012 "Comments"
 {
     PageType = API;
-    Caption = 'Customer Discount Extension';
+    Caption = 'Comments';
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
-    EntityName = 'customerDiscount';
-    EntitySetName = 'customerDiscounts';
+    EntityName = 'comment';
+    EntitySetName = 'comments';
     DelayedInsert = true;
 
-    SourceTable = "Cust. Invoice Disc.";
-    //SourceTable = 19;
+    SourceTable = "Comment Line";
+    //SourceTable = 97;
 
     layout
     {
         area(Content)
         {
-            field("invoiceDiscountCode"; Rec.Code)
+            field(tableName; Rec."Table Name")
             {
                 ApplicationArea = All;
             }
-            field("minimumAmount"; Rec."Minimum Amount")
+            field(number; Rec."No.")
             {
                 ApplicationArea = All;
             }
-            field("discountPercent"; Rec."Discount %")
+            field(lineNumber; Rec."Line No.")
+            {
+                ApplicationArea = All;
+            }
+            field(date; Rec.Date)
+            {
+                ApplicationArea = All;
+            }
+            field(code; Rec.Code)
+            {
+                ApplicationArea = All;
+            }
+            field(comment; Rec.Comment)
             {
                 ApplicationArea = All;
             }

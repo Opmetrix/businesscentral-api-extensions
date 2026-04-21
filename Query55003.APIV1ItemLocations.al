@@ -1,13 +1,13 @@
 
-query 50124 ItemWarehouseLocations
+query 55003 ItemLocations
 {
     QueryType = API;
-    Caption = 'Item Warehouse Locations API';
+    Caption = 'Item Locations API';
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
-    EntityName = 'itemWarehouseLocation';
-    EntitySetName = 'itemWarehouseLocations';
+    EntityName = 'itemLocation';
+    EntitySetName = 'itemLocations';
 
     elements
     {
@@ -19,11 +19,11 @@ query 50124 ItemWarehouseLocations
             {
                 SqlJoinType = CrossJoin;
                 column(locationCode; "Code") { }
-                dataitem(binContent; "Bin Content")
+                dataitem(itemLocations; "Item Ledger Entry")
                 {
                     DataItemLink = "Item No." = items."No.", "Location Code" = locations.Code;
                     SqlJoinType = InnerJoin;
-                    column(locationQuantity; "Quantity")
+                    column(locationQuantity; Quantity)
                     {
                         Method = Sum;
                     }

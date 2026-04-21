@@ -1,16 +1,17 @@
-page 50121 "Customer Entity Extension"
+#pragma implicitwith disable
+page 55010 "Item Entity Extension"
 {
     PageType = API;
-    Caption = 'Customer Entity Extension';
+    Caption = 'Item Entity Extension';
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
-    EntityName = 'customer';
-    EntitySetName = 'customers';
+    EntityName = 'item';
+    EntitySetName = 'items';
     DelayedInsert = true;
 
-    SourceTable = "Customer";
-    //SourceTable = 18;
+    SourceTable = "Item";
+    //SourceTable = 27;
     ODataKeyFields = SystemId;
 
     layout
@@ -21,31 +22,35 @@ page 50121 "Customer Entity Extension"
             {
                 ApplicationArea = All;
             }
-            field("customerNumber"; Rec."No.")
+            field("itemNumber"; Rec."No.")
             {
                 ApplicationArea = All;
             }
-            field("customerDiscountGroup"; Rec."Customer Disc. Group")
+            field("generalProductPostingGroupCode"; Rec."Gen. Prod. Posting Group")
             {
                 ApplicationArea = All;
             }
-            field("customerPriceGroup"; Rec."Customer Price Group")
+            field("taxProductPostingGroupCode"; Rec."VAT Prod. Posting Group")
             {
                 ApplicationArea = All;
             }
-            field("creditLimit"; Rec."Credit Limit (LCY)")
+            field("discountGroup"; Rec."Item Disc. Group")
             {
                 ApplicationArea = All;
             }
-            field("salespersonCode"; Rec."Salesperson Code")
+            field("allowInvoiceDiscount"; Rec."Allow Invoice Disc.")
             {
                 ApplicationArea = All;
             }
-            field("allowLineDiscount"; Rec."Allow Line Disc.")
+            field("salesUnitOfMeasureCode"; Rec."Sales Unit of Measure")
             {
                 ApplicationArea = All;
             }
-            field("invoiceDiscountCode"; Rec."Invoice Disc. Code")
+            field("purchaseUnitOfMeasureCode"; Rec."Purch. Unit of Measure")
+            {
+                ApplicationArea = All;
+            }
+            field("salesBlocked"; Rec."Sales Blocked")
             {
                 ApplicationArea = All;
             }
@@ -56,3 +61,4 @@ page 50121 "Customer Entity Extension"
         }
     }
 }
+#pragma implicitwith restore

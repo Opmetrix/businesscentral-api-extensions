@@ -1,43 +1,39 @@
-
-page 50124 Locations
+#pragma implicitwith disable
+page 55014 "Salesperson Entity"
 {
     PageType = API;
-    Caption = 'Locations API';
+    Caption = 'Salesperson Entity';
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
-    EntityName = 'location';
-    EntitySetName = 'locations';
+    EntityName = 'salesperson';
+    EntitySetName = 'salespersons';
     DelayedInsert = true;
 
-    //SourceTable = 14;
-    SourceTable = "Location";
+    SourceTable = "Salesperson/Purchaser";
+    //SourceTable = 13;
+    ODataKeyFields = Code;
 
     layout
     {
         area(Content)
         {
-            field(code; Rec.Code)
+            field("code"; Rec.Code)
             {
                 ApplicationArea = All;
             }
-            field(name; Rec.Name)
+            field("name"; Rec.Name)
             {
                 ApplicationArea = All;
             }
-            field(name2; Rec."Name 2")
+            field("commissionPercent"; Rec."Commission %")
             {
                 ApplicationArea = All;
             }
-            field(address; Rec.Address)
+            field("email"; Rec."E-Mail")
             {
                 ApplicationArea = All;
             }
-            field(address2; Rec."Address 2")
-            {
-                ApplicationArea = All;
-            }
-
             field(id; Rec.SystemId)
             {
                 ApplicationArea = All;
@@ -46,6 +42,8 @@ page 50124 Locations
             {
                 ApplicationArea = All;
             }
+
         }
     }
 }
+#pragma implicitwith restore

@@ -1,49 +1,43 @@
-page 50132 "Comments"
+page 55006 TaxRates
 {
     PageType = API;
-    Caption = 'Comments';
+    Caption = 'Tax Rates API';
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
-    EntityName = 'comment';
-    EntitySetName = 'comments';
+    EntityName = 'taxRate';
+    EntitySetName = 'taxRates';
     DelayedInsert = true;
 
-    SourceTable = "Comment Line";
-    //SourceTable = 97;
+    //SourceTable = 325
+    SourceTable = "VAT Posting Setup";
 
     layout
     {
         area(Content)
         {
-            field(tableName; Rec."Table Name")
+            field(businessPostingGroup; Rec."VAT Bus. Posting Group")
             {
                 ApplicationArea = All;
             }
-            field(number; Rec."No.")
+            field(productPostingGroup; Rec."VAT Prod. Posting Group")
             {
                 ApplicationArea = All;
             }
-            field(lineNumber; Rec."Line No.")
+            field(calculationType; Rec."VAT Calculation Type")
             {
                 ApplicationArea = All;
             }
-            field(date; Rec.Date)
+            field(percentage; Rec."VAT %")
             {
                 ApplicationArea = All;
             }
-            field(code; Rec.Code)
+            field(ID; Rec."VAT Identifier")
             {
                 ApplicationArea = All;
             }
-            field(comment; Rec.Comment)
-            {
-                ApplicationArea = All;
-            }
-            field(id; Rec.SystemId)
-            {
-                ApplicationArea = All;
-            }
+
+
             field(lastModifiedDateTime; Rec.SystemModifiedAt)
             {
                 ApplicationArea = All;

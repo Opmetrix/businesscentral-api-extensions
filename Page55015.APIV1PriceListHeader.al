@@ -1,5 +1,5 @@
 #pragma implicitwith disable
-page 50135 "Price List Header Entity"
+page 55015 "Price List Header Entity"
 {
     PageType = API;
     Caption = 'Price List Headers';
@@ -51,11 +51,11 @@ page 50135 "Price List Header Entity"
                 ApplicationArea = All;
             }
 
-            part(lines; 50136)
+            part(lines; 55016)
             {
                 EntityName = 'priceListLine';
                 EntitySetName = 'priceListLines';
-                SubPageLink = "Price List Code" = FIELD("Code");
+                SubPageLink = "Price List Code" = field("Code");
             }
         }
     }

@@ -1,4 +1,4 @@
-page 50139 "Sales Header Extension"
+page 55019 "Sales Header Extension"
 {
     PageType = API;
     Caption = 'Sales Header Extension';

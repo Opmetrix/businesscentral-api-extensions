@@ -1,60 +1,50 @@
-#pragma implicitwith disable
-page 50127 "Customer Addresses"
+page 55013 "Item Unit Of Measure"
 {
     PageType = API;
-    Caption = 'Customer Addresses Extension';
+    Caption = 'Item Unit Of Measure';
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
-    EntityName = 'customerAddress';
-    EntitySetName = 'customerAddresses';
+    EntityName = 'itemUnitOfMeasure';
+    EntitySetName = 'itemUnitOfMeasures';
     DelayedInsert = true;
 
-    SourceTable = "Ship-to Address";
-    //SourceTable = 222;
+    SourceTable = "Item Unit of Measure";
+    //SourceTable = 5404;
 
     layout
     {
         area(Content)
         {
-
-            field("customerNumber"; Rec."Customer No.")
+            field("itemNumber"; Rec."Item No.")
             {
                 ApplicationArea = All;
             }
-            field("code"; Rec.Code)
+            field("unitOfMeasureCode"; Rec."Code")
             {
                 ApplicationArea = All;
             }
-            field("name"; Rec.Name)
+            field("quantityPerUnitOfMeasure"; Rec."Qty. per Unit of Measure")
             {
                 ApplicationArea = All;
             }
-            field("address"; Rec.Address)
+            field("length"; Rec.Length)
             {
                 ApplicationArea = All;
             }
-            field("name2"; Rec."Name 2")
+            field("width"; Rec.Width)
             {
                 ApplicationArea = All;
             }
-            field("address2"; Rec."Address 2")
+            field("height"; Rec.Height)
             {
                 ApplicationArea = All;
             }
-            field("city"; Rec.City)
+            field("cubage"; Rec.Cubage)
             {
                 ApplicationArea = All;
             }
-            field("postcode"; Rec."Post Code")
-            {
-                ApplicationArea = All;
-            }
-            field("county"; Rec."County")
-            {
-                ApplicationArea = All;
-            }
-            field("regionCode"; Rec."Country/Region Code")
+            field("weight"; Rec.Weight)
             {
                 ApplicationArea = All;
             }
@@ -69,4 +59,3 @@ page 50127 "Customer Addresses"
         }
     }
 }
-#pragma implicitwith restore

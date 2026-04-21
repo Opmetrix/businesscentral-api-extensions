@@ -1,96 +1,79 @@
 #pragma implicitwith disable
-page 50120 SpecialPrices
+page 55011 "Contacts"
 {
     PageType = API;
-    Caption = 'Special Pricing API';
+    Caption = 'Contacts';
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
-    EntityName = 'salesPrice';
-    EntitySetName = 'salesPrices';
-    //SourceTable = 7002;
+    EntityName = 'contact';
+    EntitySetName = 'contacts';
     DelayedInsert = true;
 
-    SourceTable = "Sales Price";
+    SourceTable = "Contact";
+    //SourceTable = 5050;
 
     layout
     {
         area(Content)
         {
-            field(itemNumber; Rec."Item No.")
-            {
-                Caption = 'Item Number';
-                ApplicationArea = All;
-            }
-            field(salesType; Rec."Sales Type")
-            {
-                Caption = 'Sales Type';
-                ApplicationArea = All;
-            }
-            field(salesCode; Rec."Sales Code")
-            {
-                Caption = 'Sales Code';
-                ApplicationArea = All;
-            }
-            field(startingDate; Rec."Starting Date")
+            field("number"; Rec."No.")
             {
                 ApplicationArea = All;
             }
-            field(endingDate; Rec."Ending Date")
+            field(type; Rec.Type)
             {
                 ApplicationArea = All;
             }
-            field(currencyCode; Rec."Currency Code")
+            field("customerNumber"; Rec."Company No.")
             {
                 ApplicationArea = All;
             }
-#if BUILD_REGION_AUNZ
-            field(publishedPrice; Rec."Published Price")
+            field("name"; Rec.Name)
             {
                 ApplicationArea = All;
             }
-#endif
-            field(unitPrice; Rec."Unit Price")
+            field("firstName"; Rec."First Name")
             {
                 ApplicationArea = All;
             }
-#if BUILD_REGION_AUNZ
-            field(costPrice; Rec.Cost)
+            field("surname"; Rec.Surname)
             {
                 ApplicationArea = All;
             }
-#endif
-            field(unitofMeasureCode; Rec."Unit of Measure Code")
+            field("email"; Rec."E-Mail")
             {
                 ApplicationArea = All;
             }
-            field(priceIncludesTax; Rec."Price Includes VAT")
+            field("lastDateModified"; Rec."Last Date Modified")
             {
                 ApplicationArea = All;
             }
-            field(allowInvoiceDiscount; Rec."Allow Invoice Disc.")
+            field("lastTimeModified"; Rec."Last Time Modified")
             {
                 ApplicationArea = All;
             }
-            field(allowLineDiscount; Rec."Allow Line Disc.")
+            field("salespersonCode"; Rec."Salesperson Code")
             {
                 ApplicationArea = All;
             }
-            field(minimumQuantity; Rec."Minimum Quantity")
+            field("phoneNumber"; Rec."Phone No.")
             {
                 ApplicationArea = All;
             }
-#if BUILD_REGION_AUNZ
-            field(discountAmount; Rec."Discount Amount")
+            field("mobilePhoneNumber"; Rec."Mobile Phone No.")
             {
                 ApplicationArea = All;
             }
-            field(costPlusPercentage; Rec."Cost-plus %")
+            field("faxNumber"; Rec."Fax No.")
             {
                 ApplicationArea = All;
             }
-#endif
-            field(variantCode; Rec."Variant Code")
+            field("jobTitle"; Rec."Job Title")
+            {
+                ApplicationArea = All;
+            }
+            field("territoryCode"; Rec."Territory Code")
             {
                 ApplicationArea = All;
             }
@@ -102,7 +85,6 @@ page 50120 SpecialPrices
             {
                 ApplicationArea = All;
             }
-
         }
     }
 }

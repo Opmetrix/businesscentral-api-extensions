@@ -1,4 +1,4 @@
-query 50137 ItemCategories
+query 55017 ItemCategories
 {
     QueryType = API;
     Caption = 'Item Categories Entity';

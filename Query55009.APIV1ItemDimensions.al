@@ -1,20 +1,20 @@
-query 50128 "Customer Dimensions Extension"
+query 55009 "Item Dimensions Extension"
 {
     QueryType = API;
-    Caption = 'Customer Dimensions Extension';
+    Caption = 'Item Dimensions Extension';
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
     APIVersion = 'v1.0';
-    EntityName = 'customerDimension';
-    EntitySetName = 'customerDimensions';
+    EntityName = 'itemDimension';
+    EntitySetName = 'itemDimensions';
 
     elements
     {
 
         dataitem(defaultDimensions; "Default Dimension")
         {
-            DataItemTableFilter = "Table ID" = const(18);
-            column("customerNumber"; "No.") { }
+            DataItemTableFilter = "Table ID" = const(27);
+            column("itemNumber"; "No.") { }
             column("dimensionCode"; "Dimension Code") { }
             column("dimensionValueCode"; "Dimension Value Code") { }
             dataitem(dimensions; "Dimension")

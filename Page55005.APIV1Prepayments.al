@@ -1,5 +1,5 @@
 #pragma implicitwith disable
-page 50125 "Prepayments"
+page 55005 "Prepayments"
 {
     APIPublisher = 'Opmetrix';
     APIGroup = 'opmetrix';
