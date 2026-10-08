@@ -673,20 +673,19 @@ codeunit 50130 "Post Prepayments"
                          SalesLine."Prepayment VAT Identifier", SalesLine."Prepmt. VAT Calc. Type", SalesLine."Prepayment Tax Group Code", false, NewAmount >= 0)
                     then begin
 #if BUILD_REGION_AUNZ
-                        VATAmountLine.InsertNewLine(
-                          SalesLine."Prepayment VAT Identifier",
-                          SalesLine."Prepmt. VAT Calc. Type",
-                          SalesLine."Prepayment Tax Group Code",
-                          false,
-                          SalesLine."Prepayment VAT %",
-                          NewAmount >= 0,
-                          true,
-                          /*
-                           * Added to fix "There is no argument given that corresponds to the required formal parameter 'IsFullGST'"
-                           */
-                          false,
-                          SalesLine."Prepmt VAT Diff. to Deduct"
-                        );
+                        // BC v29: "VAT Amount Line".InsertNewLine was removed; populate and insert the line directly
+                        // (same approach as Microsoft's Sales-Post Prepayments InsertVATAmountLine).
+                        VATAmountLine.Init();
+                        VATAmountLine."VAT Identifier" := SalesLine."Prepayment VAT Identifier";
+                        VATAmountLine."VAT Calculation Type" := SalesLine."Prepmt. VAT Calc. Type";
+                        VATAmountLine."Tax Group Code" := SalesLine."Prepayment Tax Group Code";
+                        VATAmountLine."Use Tax" := false;
+                        VATAmountLine."VAT %" := SalesLine."Prepayment VAT %";
+                        VATAmountLine.Positive := NewAmount >= 0;
+                        VATAmountLine.Modified := true;
+                        VATAmountLine."Includes Prepayment" := true;
+                        VATAmountLine."Full GST on Prepayment" := false;
+                        VATAmountLine.Insert();
 #endif
                     end;
 
