@@ -1,3 +1,4 @@
+#if TESTAPP
 /// <summary>
 /// Tests for the Prepayments API page (page 50125) and, through it, the Post Prepayments codeunit (50130).
 /// NOTE: the code under test commits, so these tests cannot be rolled back. Run them on a disposable BC container.
@@ -337,3 +338,4 @@ codeunit 50201 "OPM Prepayments API Tests"
         exit(SalesLine."Gen. Prod. Posting Group");
     end;
 }
+#endif

@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     1. Creates (or reuses) a Business Central sandbox container for the AU country.
-    2. Compiles the extension (AU/NZ build, apppp.json) and the test app (test/app.json).
+    2. Compiles the extension (AU/NZ build, app.json) and the test app (test/app.json).
     3. Publishes both apps, runs every test in the test app with code coverage tracking.
     4. Writes the JUnit/XUnit result and the coverage output to $OutputPath and fails the script when a test fails or
        coverage is below $MinimumCoverage.
@@ -41,7 +41,7 @@ $ErrorActionPreference = 'Stop'
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 if (-not $OutputPath) { $OutputPath = Join-Path $scriptRoot '..\output-tests' }
 $repoRoot = Resolve-Path (Join-Path $scriptRoot '..')
-$mainAppFolder = Join-Path $repoRoot.Path 'app'
+$mainAppFolder = $repoRoot.Path
 $testAppFolder = $scriptRoot
 New-Item -ItemType Directory -Force -Path $OutputPath | Out-Null
 $OutputPath = (Resolve-Path $OutputPath).Path

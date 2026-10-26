@@ -1,3 +1,4 @@
+#if TESTAPP
 /// <summary>
 /// Direct tests of the public procedures of the Post Prepayments codeunit (50130).
 /// NOTE: posting commits, so these tests cannot be rolled back. Run them on a disposable BC container.
@@ -424,3 +425,4 @@ codeunit 50202 "OPM Post Prepayments Tests"
         SalesHeader.Modify(true);
     end;
 }
+#endif

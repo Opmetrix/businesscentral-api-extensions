@@ -1,3 +1,4 @@
+#if TESTAPP
 /// <summary>
 /// Tests for the customer payment journal API page (page 50128) and the customer payments API page (page 50129).
 /// The page actions are called directly on page variables. The page triggers (OnOpenPage, OnNewRecord) are run by calling the
@@ -157,3 +158,4 @@ codeunit 50203 "OPM Payment API Tests"
     begin
     end;
 }
+#endif

@@ -14,6 +14,17 @@ Microsoft's test libraries (Library Assert, Any, Application Test Library, Tests
 The other pages and queries (50120 to 50124, 50126, 50127, 50130 to 50137 and the `Query*` objects) are declarative API
 definitions with no executable statements, so they have nothing to cover.
 
+## Layout: how the test folder is kept out of the extension build
+
+The extension project is the repository root (`app.json`, `app-WW.json`), and the AL compiler includes every `.al` file below a
+project folder, so `test/` is inside the extension's compile scope. To keep the test code out of the extension, every file in
+`test/src` is wrapped in `#if TESTAPP ... #endif`. The extension builds (AU/NZ and worldwide) do not define `TESTAPP`, so they see
+empty files and compile no test objects. Only this app defines it (`preprocessorSymbols` in `test/app.json`).
+
+* New test files must start with `#if TESTAPP` and end with `#endif`, or the extension build will fail.
+* The extension's `.app` still carries the text of these files in its bundled source (the extension's `app.json` sets
+  `includeSourceInSymbolFile`), but no test objects are compiled into it.
+
 ## Running
 
 ```powershell

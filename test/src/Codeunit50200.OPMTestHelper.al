@@ -1,3 +1,4 @@
+#if TESTAPP
 /// <summary>
 /// Shared scenario builders for the Opmetrix extension tests.
 /// </summary>
@@ -106,3 +107,4 @@ codeunit 50200 "OPM Test Helper"
         SalesHeader.Modify();
     end;
 }
+#endif

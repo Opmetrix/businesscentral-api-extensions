@@ -1,3 +1,4 @@
+#if TESTAPP
 /// <summary>
 /// Tests for the sales header API page (page 50139) and the sales invoice line API part (page 50138, reached through
 /// the sales invoice API page 50137).
@@ -159,3 +160,4 @@ codeunit 50204 "OPM Sales Document API Tests"
         exit(LowerCase(DelChr(Format(Id), '=', '{}')));
     end;
 }
+#endif
