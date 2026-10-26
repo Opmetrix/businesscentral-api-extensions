@@ -33,14 +33,16 @@ param(
     [string]$ContainerName = 'opmetrix-tests',
     [string]$Artifact = '',
     [double]$MinimumCoverage = 100,
-    [string]$OutputPath = (Join-Path $PSScriptRoot '..\output-tests'),
+    [string]$OutputPath = '',
     [switch]$KeepContainer
 )
 
 $ErrorActionPreference = 'Stop'
-$repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
+$scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+if (-not $OutputPath) { $OutputPath = Join-Path $scriptRoot '..\output-tests' }
+$repoRoot = Resolve-Path (Join-Path $scriptRoot '..')
 $mainAppFolder = Join-Path $repoRoot.Path 'app'
-$testAppFolder = $PSScriptRoot
+$testAppFolder = $scriptRoot
 New-Item -ItemType Directory -Force -Path $OutputPath | Out-Null
 $OutputPath = (Resolve-Path $OutputPath).Path
 
