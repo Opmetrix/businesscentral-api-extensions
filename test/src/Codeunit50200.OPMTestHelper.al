@@ -467,5 +467,19 @@ codeunit 50200 "OPM Test Helper"
         GenJournalLine.Validate(Amount, -Any.DecimalInRange(100, 1000, 2));
         GenJournalLine.Modify(true);
     end;
+
+    procedure CreatePaymentTerms(CalcPmtDiscOnCrMemos: Boolean): Code[10]
+    var
+        PaymentTerms: Record "Payment Terms";
+    begin
+        PaymentTerms.Init();
+        PaymentTerms.Code := 'O' + CopyStr(Any.AlphanumericText(5), 1, 5);
+        Evaluate(PaymentTerms."Due Date Calculation", '<30D>');
+        Evaluate(PaymentTerms."Discount Date Calculation", '<10D>');
+        PaymentTerms."Discount %" := 2;
+        PaymentTerms."Calc. Pmt. Disc. on Cr. Memos" := CalcPmtDiscOnCrMemos;
+        PaymentTerms.Insert();
+        exit(PaymentTerms.Code);
+    end;
 }
 #endif

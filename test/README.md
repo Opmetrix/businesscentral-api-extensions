@@ -32,6 +32,7 @@ prepayment number series in Sales & Receivables Setup (Posted Prepmt. Inv. Nos. 
 | `Codeunit50202.OPMPostPrepaymentsTests.al` | Public procedures of codeunit 50130 (`Post Prepayments`) |
 | `Codeunit50203.OPMPaymentApiTests.al` | Customer payment journals page 50128 and customer payments page 50129 (actions) |
 | `Codeunit50204.OPMSalesDocumentApiTests.al` | Sales header page 50139 actions |
+| `Codeunit50205.OPMPrepaymentCreditMemoTests.al` | Prepayment credit memo flow of codeunit 50130 (via the new `PostPrepaymentCreditMemo`) |
 | `Codeunit50230.OPMSmokeTests.al` | One test that needs no data; proves the runner works |
 | `Codeunit50210`, `Table50210` to `50212`, `Page50210` to `50212` | The runner: runs the tests, tracks coverage and exposes results through the API |
 
@@ -51,34 +52,39 @@ empty files and compile no test objects. Only this app defines it (`preprocessor
 
 ## Current result (sandbox, Business Central 29)
 
-54 tests, all passing. **Line coverage 80.77 % (588 of 728 executable lines).**
+66 tests, all passing. **Line coverage 96.05 % (706 of 735 executable lines).**
 
 | Object | Lines | Covered | % |
 |---|---:|---:|---:|
 | Page 50125 Prepayments | 45 | 45 | 100 |
 | Page 50128 Cust. Paym. Journals | 17 | 17 | 100 |
 | Page 50129 CustomerPayments | 5 | 5 | 100 |
-| Codeunit 50130 Post Prepayments | 606 | 473 | 78.1 |
+| Codeunit 50130 Post Prepayments | 613 | 591 | 96.4 |
 | Page 50138 Sales Invoice Line Extension | 36 | 31 | 86.1 |
 | Page 50139 Sales Header Extension | 19 | 17 | 89.5 |
 
-## The remaining 140 lines (why it is not 100 %)
+`PostPrepaymentCreditMemo` was added to codeunit 50130 for this (see below); without it the prepayment credit memo path cannot be
+started and coverage stays at about 81 %.
 
-The ticket says production code stays unchanged except for small changes needed to make a path testable, and those need to be
-agreed first. All of these are unreachable today:
+## The remaining 29 lines
 
-| Code | Lines | Why it cannot run |
+| Code | Lines | Why it is not covered |
 |---|---:|---|
-| Prepayment credit memo: `Execute` credit memo case, `CreditMemo`, `Code(..., 1)`, `UpdateDocNos`, `InsertSalesCrMemoHeader`, `InsertSalesCrMemoLine`, `GetCalcPmtDiscOnCrMemos`, credit memo branches of `PostBalancingEntry`, `UpdatePostedSalesDocument`, `UpdateSalesDocument`, `CopyHeaderCommentLines`, `CopyLineCommentLines`, `InsertExtendedText`, `GetCurrencyAmountRoundingPrecision`, `PrepmtDocTypeToDocType` | about 105 | `SetDocumentType` is private and is only ever called with `Invoice` (in `PostPrepaymentInvoice`). No public entry point posts a prepayment credit memo. |
-| `AdjustInvLineBuffers` correction branches, `InsertCorrInvLineBuffer`, credit memo part of `CalcPrepmtAmtInvLCYInLines` | about 20 | The VAT adjustment is only calculated for credit memos, so an invoice never reaches these lines. |
-| Preview mode (`PreviewMode`, `GenJnlPostPreview.ThrowError`, `'***'` numbers) and the `Handled` checks | about 8 | `PreviewMode` is never set to true and `Handled` is never set. |
-| `UpdateVATOnLines` branches for a zero prepayment amount, a zero VAT base and a zero invoice discount base; `RoundAmounts` line with equal `Amount` and `Amount Incl. VAT` in a foreign currency | about 7 | Lines with a zero prepayment amount are skipped before these lines; the other branches need VAT set-ups that are not reachable from the API. |
+| Preview mode: `GenJnlPostPreview.ThrowError` and the two `'***'` document numbers in `UpdateDocNos` | 3 | `PreviewMode` is never set to true. |
+| `AdjustInvLineBuffers` and `InsertCorrInvLineBuffer` correction branches | 15 | They run only when the rounded local currency amounts of the prepayment lines differ from the total by more than a rounding amount. Not reached with the exchange rates used; needs a purpose built rate and amounts. |
+| `PrepmtDocTypeToDocType` final `exit(2)` | 1 | Both option values return inside the `case`. |
+| `UpdateVATOnLines`: zero prepayment amount (2 lines), zero VAT base, zero invoice discount base | 4 | Lines with a zero prepayment amount are skipped before these lines; the others need VAT set-ups not reachable from the API. |
+| `RoundAmounts`: equal `Amount` and `Amount Incl. VAT` in a foreign currency | 1 | Needs a 0 % VAT line in a foreign currency. |
+| `PostBalancingEntry`: customer ledger entry with amount 0 | 1 | Not reachable. |
 | Page 50139 `OnModifyRecord` id and number errors | 2 | The platform rejects a change of `SystemId` or `No.` before the trigger runs. |
-| Page 50138 error branches (aggregate, line or document id missing) | 4 | The sales invoice API always supplies valid ids. |
+| Page 50138: aggregate, line or document id missing (4 lines), id filter | 5 | The sales invoice API always supplies valid ids. |
 
-Options: (a) agree a small change that exposes a public `PostPrepaymentCreditMemo`, which makes the credit memo path testable (about
-125 more lines), and delete the dead preview, suppress-commit and handled code, or (b) keep the list above as the documented
-exclusions.
+## Production change made for the tests
+
+`Codeunit50130.PostPrepayments.al` has one added public procedure, `PostPrepaymentCreditMemo`, which mirrors
+`PostPrepaymentInvoice` (it sets the document type to credit memo and runs the codeunit). The credit memo code in the codeunit
+already existed but nothing could start it. No existing behaviour changed. Nothing in the extension calls the new procedure; remove
+it (and `test/src/Codeunit50205.OPMPrepaymentCreditMemoTests.al`) if you do not want it in the extension.
 
 ## Not done yet
 
