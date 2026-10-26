@@ -1,7 +1,7 @@
 #if TESTAPP
 /// <summary>
 /// Tests for the Prepayments API page (page 50125) and, through it, the Post Prepayments codeunit (50130).
-/// NOTE: the code under test commits, so these tests cannot be rolled back. Run them on a disposable BC container.
+/// NOTE: the code under test commits, so these tests cannot be rolled back. Run them on a disposable sandbox.
 /// </summary>
 codeunit 50201 "OPM Prepayments API Tests"
 {
@@ -10,9 +10,6 @@ codeunit 50201 "OPM Prepayments API Tests"
     var
         Assert: Codeunit "Library Assert";
         Helper: Codeunit "OPM Test Helper";
-        LibrarySales: Codeunit "Library - Sales";
-        LibraryERM: Codeunit "Library - ERM";
-        LibraryRandom: Codeunit "Library - Random";
 
     [Test]
     procedure SingleLineOrderPostsPrepaymentInvoice()
@@ -31,13 +28,9 @@ codeunit 50201 "OPM Prepayments API Tests"
     procedure MultiLineOrderSpreadsPrepaymentAcrossLines()
     var
         SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
     begin
-        // Two normal lines plus one zero-priced line (Line Amount = 0 is skipped when allocating the prepayment)
-        Helper.CreateOrder(SalesHeader, 2, false);
-        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::"G/L Account", Helper.LineGLAccountNo(), 1);
-        SalesLine.Validate("Unit Price", 0);
-        SalesLine.Modify(true);
+        // The prepayment is allocated line by line until the order total is used up
+        Helper.CreateOrder(SalesHeader, 3, false);
 
         Helper.CreatePrepaymentViaApi(SalesHeader);
 
@@ -73,6 +66,111 @@ codeunit 50201 "OPM Prepayments API Tests"
     end;
 
     [Test]
+    procedure DocumentDateDifferentFromPostingDateIsAligned()
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        Helper.CreateOrder(SalesHeader, 1, false);
+        SalesHeader.Validate("Document Date", CalcDate('<-1D>', SalesHeader."Posting Date"));
+        SalesHeader.Modify(true);
+
+        Helper.CreatePrepaymentViaApi(SalesHeader);
+
+        VerifyPrepaymentInvoicePosted(SalesHeader);
+        Assert.AreEqual(SalesHeader."Posting Date", SalesHeader."Document Date", 'Document Date should follow the Posting Date');
+    end;
+
+    [Test]
+    procedure PrepaymentPostingDescriptionOnOrderIsUsedOnInvoice()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+    begin
+        Helper.CreateOrder(SalesHeader, 1, false);
+        SalesHeader.Validate("Prepmt. Posting Description", 'Opmetrix prepayment');
+        SalesHeader.Modify(true);
+
+        Helper.CreatePrepaymentViaApi(SalesHeader);
+
+        SalesInvoiceHeader.Get(SalesHeader."Last Prepayment No.");
+        Assert.AreEqual('Opmetrix prepayment', SalesInvoiceHeader."Posting Description", 'Posting Description');
+    end;
+
+    [Test]
+    procedure NotCompressedPrepaymentCreatesInvoiceLinePerOrderLine()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+    begin
+        Helper.CreateOrder(SalesHeader, 3, false);
+        SalesHeader.Validate("Compress Prepayment", false);
+        SalesHeader.Modify(true);
+
+        Helper.CreatePrepaymentViaApi(SalesHeader);
+
+        VerifyPrepaymentInvoicePosted(SalesHeader);
+        SalesInvoiceLine.SetRange("Document No.", SalesHeader."Last Prepayment No.");
+        Assert.RecordCount(SalesInvoiceLine, 3);
+    end;
+
+    [Test]
+    procedure InvoiceRoundingWithNothingToRoundAddsNoRoundingLine()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+    begin
+        Helper.SetInvoiceRounding(true);
+        Helper.SetInvRoundingPrecisionLCY(1);
+        Helper.CreateOrder(SalesHeader, 1, false);
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.FindFirst();
+        SalesLine.Validate(Quantity, 1);
+        SalesLine.Validate("Unit Price", 100);
+        SalesLine.Modify(true);
+
+        Helper.CreatePrepaymentViaApi(SalesHeader);
+
+        VerifyPrepaymentInvoicePosted(SalesHeader);
+        Helper.SetInvoiceRounding(false);
+    end;
+
+    [Test]
+    procedure InvoiceRoundingWithPricesIncludingVATAddsRoundingLine()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+    begin
+        Helper.SetInvoiceRounding(true);
+        Helper.SetInvRoundingPrecisionLCY(1);
+        Helper.CreateOrder(SalesHeader, 1, true);
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.FindFirst();
+        SalesLine.Validate(Quantity, 1);
+        SalesLine.Validate("Unit Price", 100.37);
+        SalesLine.Modify(true);
+
+        Helper.CreatePrepaymentViaApi(SalesHeader);
+
+        VerifyPrepaymentInvoicePosted(SalesHeader);
+        Helper.SetInvoiceRounding(false);
+    end;
+
+    [Test]
+    procedure ForeignCurrencyFullVATOrderPostsPrepaymentInvoice()
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        Helper.CreateOrderWithVATCalculation(
+          SalesHeader, 1, false, Helper.CreateCurrencyWithExchangeRate(), "Tax Calculation Type"::"Full VAT");
+
+        Helper.CreatePrepaymentViaApi(SalesHeader);
+
+        VerifyPrepaymentInvoicePosted(SalesHeader);
+    end;
+
+    [Test]
     procedure ReverseChargeVATOrderPostsPrepaymentInvoice()
     var
         SalesHeader: Record "Sales Header";
@@ -101,8 +199,7 @@ codeunit 50201 "OPM Prepayments API Tests"
     var
         SalesHeader: Record "Sales Header";
     begin
-        Helper.CreateOrderWithCurrency(
-          SalesHeader, 2, false, LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), 1.5, 1.5));
+        Helper.CreateOrderWithCurrency(SalesHeader, 2, false, Helper.CreateCurrencyWithExchangeRate());
 
         Helper.CreatePrepaymentViaApi(SalesHeader);
 
@@ -115,8 +212,8 @@ codeunit 50201 "OPM Prepayments API Tests"
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
     begin
-        LibrarySales.SetInvoiceRounding(true);
-        LibraryERM.SetInvRoundingPrecisionLCY(1);
+        Helper.SetInvoiceRounding(true);
+        Helper.SetInvRoundingPrecisionLCY(1);
         Helper.CreateOrder(SalesHeader, 1, false);
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
@@ -128,20 +225,18 @@ codeunit 50201 "OPM Prepayments API Tests"
         Helper.CreatePrepaymentViaApi(SalesHeader);
 
         VerifyPrepaymentInvoicePosted(SalesHeader);
-        LibrarySales.SetInvoiceRounding(false);
+        Helper.SetInvoiceRounding(false);
     end;
 
     [Test]
     procedure BalancingAccountPostsPaymentEntry()
     var
         SalesHeader: Record "Sales Header";
-        BankAccount: Record "Bank Account";
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
-        LibraryERM.CreateBankAccount(BankAccount);
         Helper.CreateOrder(SalesHeader, 1, false);
         SalesHeader.Validate("Bal. Account Type", SalesHeader."Bal. Account Type"::"Bank Account");
-        SalesHeader.Validate("Bal. Account No.", BankAccount."No.");
+        SalesHeader.Validate("Bal. Account No.", Helper.CreateBankAccount());
         SalesHeader.Modify(true);
 
         Helper.CreatePrepaymentViaApi(SalesHeader);
@@ -159,42 +254,40 @@ codeunit 50201 "OPM Prepayments API Tests"
         SalesLine: Record "Sales Line";
         SalesCommentLine: Record "Sales Comment Line";
     begin
-        LibrarySales.SetCopyCommentsOrderToInvoiceInSetup(true);
+        Helper.SetCopyCommentsOrderToInvoice(true);
         Helper.CreateOrder(SalesHeader, 1, false);
-        LibrarySales.CreateSalesCommentLine(SalesCommentLine, SalesCommentLine."Document Type"::Order, SalesHeader."No.", 0);
+        Helper.CreateSalesComment(SalesHeader."No.", 0);
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.FindFirst();
-        LibrarySales.CreateSalesCommentLine(
-          SalesCommentLine, SalesCommentLine."Document Type"::Order, SalesHeader."No.", SalesLine."Line No.");
+        Helper.CreateSalesComment(SalesHeader."No.", SalesLine."Line No.");
 
         Helper.CreatePrepaymentViaApi(SalesHeader);
 
-        SalesCommentLine.Reset();
         SalesCommentLine.SetRange("Document Type", SalesCommentLine."Document Type"::"Posted Invoice");
         SalesCommentLine.SetRange("No.", SalesHeader."Last Prepayment No.");
         Assert.RecordIsNotEmpty(SalesCommentLine);
+        Helper.SetCopyCommentsOrderToInvoice(false);
     end;
 
     [Test]
     procedure ExtendedTextOnPrepaymentAccountIsAddedToInvoice()
     var
         SalesHeader: Record "Sales Header";
-        GeneralPostingSetup: Record "General Posting Setup";
+        GLAccount: Record "G/L Account";
         ExtendedTextHeader: Record "Extended Text Header";
         ExtendedTextLine: Record "Extended Text Line";
         SalesInvoiceLine: Record "Sales Invoice Line";
-        PrepmtAccountNo: Code[20];
     begin
         Helper.CreateOrder(SalesHeader, 1, false);
-        SalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.");
-        // The prepayment G/L account is taken from the posting setup of the order line
-        GeneralPostingSetup.Get(SalesHeader."Gen. Bus. Posting Group", LineGenProdPostingGroup(SalesHeader));
-        PrepmtAccountNo := GeneralPostingSetup.GetSalesPrepmtAccount();
+        // Extended text is only added for accounts with automatic extended texts
+        GLAccount.Get(Helper.PrepaymentGLAccountNoValue());
+        GLAccount."Automatic Ext. Texts" := true;
+        GLAccount.Modify();
 
         ExtendedTextHeader.Init();
         ExtendedTextHeader."Table Name" := ExtendedTextHeader."Table Name"::"G/L Account";
-        ExtendedTextHeader."No." := PrepmtAccountNo;
+        ExtendedTextHeader."No." := Helper.PrepaymentGLAccountNoValue();
         ExtendedTextHeader."Text No." := 1;
         ExtendedTextHeader."All Language Codes" := true;
         ExtendedTextHeader."Prepmt. Sales Invoice" := true;
@@ -220,16 +313,16 @@ codeunit 50201 "OPM Prepayments API Tests"
         SalesHeader: Record "Sales Header";
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
     begin
+        Helper.CreateOrder(SalesHeader, 1, false);
         SalesReceivablesSetup.Get();
         SalesReceivablesSetup."Ext. Doc. No. Mandatory" := true;
         SalesReceivablesSetup.Modify();
-        Helper.CreateOrder(SalesHeader, 1, false);
 
         asserterror Helper.CreatePrepaymentViaApi(SalesHeader);
-        Assert.ExpectedErrorCode('TestField');
 
         SalesReceivablesSetup."Ext. Doc. No. Mandatory" := false;
         SalesReceivablesSetup.Modify();
+        Assert.ExpectedErrorCode('Dialog');
     end;
 
     [Test]
@@ -252,7 +345,7 @@ codeunit 50201 "OPM Prepayments API Tests"
         SalesHeader: Record "Sales Header";
     begin
         Helper.CreateOrder(SalesHeader, 1, false);
-        LibrarySales.ReleaseSalesDocument(SalesHeader);
+        Helper.ReleaseOrder(SalesHeader);
 
         asserterror Helper.CreatePrepaymentViaApi(SalesHeader);
 
@@ -264,8 +357,7 @@ codeunit 50201 "OPM Prepayments API Tests"
     var
         SalesHeader: Record "Sales Header";
     begin
-        LibrarySales.CreateSalesHeader(
-          SalesHeader, SalesHeader."Document Type"::Invoice, LibrarySales.CreateCustomerNo());
+        Helper.CreateInvoiceHeader(SalesHeader);
 
         asserterror Helper.CreatePrepaymentViaApi(SalesHeader);
 
@@ -326,16 +418,6 @@ codeunit 50201 "OPM Prepayments API Tests"
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.CalcSums("Line Amount", "Prepmt. Amt. Inv.");
         Assert.AreEqual(SalesLine."Line Amount", SalesLine."Prepmt. Amt. Inv.", 'Whole order should be invoiced as prepayment');
-    end;
-
-    local procedure LineGenProdPostingGroup(SalesHeader: Record "Sales Header"): Code[20]
-    var
-        SalesLine: Record "Sales Line";
-    begin
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        SalesLine.FindFirst();
-        exit(SalesLine."Gen. Prod. Posting Group");
     end;
 }
 #endif

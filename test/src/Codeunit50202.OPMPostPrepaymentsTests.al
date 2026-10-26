@@ -1,4 +1,5 @@
 #if TESTAPP
+#if TESTAPP
 /// <summary>
 /// Direct tests of the public procedures of the Post Prepayments codeunit (50130).
 /// NOTE: posting commits, so these tests cannot be rolled back. Run them on a disposable BC container.
@@ -10,8 +11,6 @@ codeunit 50202 "OPM Post Prepayments Tests"
     var
         Assert: Codeunit "Library Assert";
         Helper: Codeunit "OPM Test Helper";
-        LibrarySales: Codeunit "Library - Sales";
-        LibraryERM: Codeunit "Library - ERM";
         PostPrepayments: Codeunit "Post Prepayments";
         DocumentTypeStatistic: Option Invoice,"Credit Memo",Statistic;
 
@@ -66,7 +65,7 @@ codeunit 50202 "OPM Post Prepayments Tests"
 
         asserterror PostPrepayments.PostPrepaymentInvoice(SalesHeader);
 
-        Assert.ExpectedErrorCode('TestField');
+        Assert.ExpectedErrorCode('Dialog');
     end;
 
     [Test]
@@ -87,8 +86,7 @@ codeunit 50202 "OPM Post Prepayments Tests"
     begin
         CreateOrderReadyForPrepayment(SalesHeader, 1, 100);
         // Same posting groups as the sell-to customer so the order stays valid
-        BillToCustomer.Get(
-          LibrarySales.CreateCustomerWithBusPostingGroups(SalesHeader."Gen. Bus. Posting Group", SalesHeader."VAT Bus. Posting Group"));
+        Helper.CreateCustomer(BillToCustomer);
         SalesHeader."Bill-to Customer No." := BillToCustomer."No.";
 
         PostPrepayments.CheckPrepmtDoc(SalesHeader, 0);
@@ -120,8 +118,7 @@ codeunit 50202 "OPM Post Prepayments Tests"
     var
         SalesHeader: Record "Sales Header";
     begin
-        LibrarySales.CreateSalesHeader(
-          SalesHeader, SalesHeader."Document Type"::Invoice, LibrarySales.CreateCustomerNo());
+        Helper.CreateInvoiceHeader(SalesHeader);
 
         asserterror PostPrepayments.CheckPrepmtDoc(SalesHeader, 0);
 
@@ -165,11 +162,11 @@ codeunit 50202 "OPM Post Prepayments Tests"
         GeneralLedgerSetup.Modify();
 
         asserterror PostPrepayments.CheckPrepmtDoc(SalesHeader, 0);
-        Assert.ExpectedErrorCode('Validation');
 
         GeneralLedgerSetup."Allow Posting From" := OriginalFrom;
         GeneralLedgerSetup."Allow Posting To" := OriginalTo;
         GeneralLedgerSetup.Modify();
+        Assert.ExpectedError('is not within your range of allowed posting dates');
     end;
 
     [Test]
@@ -236,7 +233,7 @@ codeunit 50202 "OPM Post Prepayments Tests"
         Currency: Record Currency;
     begin
         Helper.CreateOrderWithCurrency(
-          SalesHeader, 1, false, LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), 1.5, 1.5));
+          SalesHeader, 1, false, Helper.CreateCurrencyWithExchangeRate());
         Currency.Get(SalesHeader."Currency Code");
 
         Assert.AreEqual(Currency.GetRealizedGainsAccount(), PostPrepayments.GetCorrBalAccNo(SalesHeader, true), 'Gain account');
@@ -248,9 +245,13 @@ codeunit 50202 "OPM Post Prepayments Tests"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
+        TempVATAmountLine: Record "VAT Amount Line" temporary;
         TempPrepaymentInvLineBuffer: Record "Prepayment Inv. Line Buffer" temporary;
     begin
         CreateOrderReadyForPrepayment(SalesHeader, 3, 100);
+        SalesHeader."Compress Prepayment" := false;
+        PostPrepayments.CalcVATAmountLines(SalesHeader, SalesLine, TempVATAmountLine, DocumentTypeStatistic::Statistic);
+        PostPrepayments.UpdateVATOnLines(SalesHeader, SalesLine, TempVATAmountLine, DocumentTypeStatistic::Statistic);
 
         PostPrepayments.BuildInvLineBuffer(SalesHeader, SalesLine, DocumentTypeStatistic::Statistic, TempPrepaymentInvLineBuffer);
 
@@ -264,10 +265,11 @@ codeunit 50202 "OPM Post Prepayments Tests"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
+        TempVATAmountLine: Record "VAT Amount Line" temporary;
         TempPrepaymentInvLineBuffer: Record "Prepayment Inv. Line Buffer" temporary;
     begin
-        LibrarySales.SetInvoiceRounding(true);
-        LibraryERM.SetInvRoundingPrecisionLCY(1);
+        Helper.SetInvoiceRounding(true);
+        Helper.SetInvRoundingPrecisionLCY(1);
         Helper.CreateOrder(SalesHeader, 1, false);
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
@@ -276,12 +278,14 @@ codeunit 50202 "OPM Post Prepayments Tests"
         SalesLine.Validate("Unit Price", 100.37);
         SalesLine.Modify(true);
         Helper.SetPrepaymentPercent(SalesHeader, 100);
+        PostPrepayments.CalcVATAmountLines(SalesHeader, SalesLine, TempVATAmountLine, DocumentTypeStatistic::Statistic);
+        PostPrepayments.UpdateVATOnLines(SalesHeader, SalesLine, TempVATAmountLine, DocumentTypeStatistic::Statistic);
 
         PostPrepayments.BuildInvLineBuffer(SalesHeader, SalesLine, DocumentTypeStatistic::Statistic, TempPrepaymentInvLineBuffer);
 
         TempPrepaymentInvLineBuffer.SetRange("Invoice Rounding", true);
         Assert.RecordIsNotEmpty(TempPrepaymentInvLineBuffer);
-        LibrarySales.SetInvoiceRounding(false);
+        Helper.SetInvoiceRounding(false);
     end;
 
     [Test]
@@ -300,7 +304,7 @@ codeunit 50202 "OPM Post Prepayments Tests"
 
         asserterror PostPrepayments.BuildInvLineBuffer(SalesHeader, SalesLine, DocumentTypeStatistic::Statistic, TempPrepaymentInvLineBuffer);
 
-        Assert.ExpectedErrorCode('Validation');
+        Assert.ExpectedError('must be positive');
     end;
 
     [Test]
@@ -319,7 +323,7 @@ codeunit 50202 "OPM Post Prepayments Tests"
 
         asserterror PostPrepayments.BuildInvLineBuffer(SalesHeader, SalesLine, DocumentTypeStatistic::Statistic, TempPrepaymentInvLineBuffer);
 
-        Assert.ExpectedErrorCode('Validation');
+        Assert.ExpectedError('must be positive');
     end;
 
     [Test]
@@ -343,6 +347,7 @@ codeunit 50202 "OPM Post Prepayments Tests"
 
         // Compressed: line identity is dropped
         SalesHeader."Compress Prepayment" := true;
+        Clear(PrepaymentInvLineBuffer);
         PostPrepayments.FillInvLineBuffer(SalesHeader, SalesLine, PrepaymentInvLineBuffer);
         Assert.AreEqual(0, PrepaymentInvLineBuffer."Line No.", 'Line No. when compressed');
     end;
@@ -425,4 +430,5 @@ codeunit 50202 "OPM Post Prepayments Tests"
         SalesHeader.Modify(true);
     end;
 }
+#endif
 #endif
