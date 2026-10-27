@@ -45,6 +45,25 @@ codeunit 50130 "Post Prepayments"
         SalesHeader2 := SalesHeader;
     end;
 
+    /// <summary>
+    /// Posts a prepayment credit memo for the order. Mirrors PostPrepaymentInvoice; the credit memo flow already existed in
+    /// this codeunit but no public entry point could start it.
+    /// </summary>
+    procedure PostPrepaymentCreditMemo(var SalesHeader2: Record "Sales Header")
+    var
+        SalesHeader: Record "Sales Header";
+        ErrorMessageMgt: Codeunit "Error Message Management";
+        ErrorMessageHandler: Codeunit "Error Message Handler";
+    begin
+        SalesHeader.Copy(SalesHeader2);
+        ErrorMessageMgt.Activate(ErrorMessageHandler);
+        SetDocumentType(SalesHeader."Document Type"::"Credit Memo");
+        Commit();
+        IF NOT Run(SalesHeader) THEN
+            ErrorMessageHandler.ShowErrors;
+        SalesHeader2 := SalesHeader;
+    end;
+
     local procedure SetDocumentType(DocumentType: Enum "Sales Document Type")
     begin
         PrepmtDocumentType := DocumentType;
